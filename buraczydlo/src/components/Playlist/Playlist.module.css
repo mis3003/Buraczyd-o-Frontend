@@ -1,0 +1,15 @@
+.main {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .song {
+    padding: 10px;
+    border-bottom: 1px solid #600028;
+    cursor: pointer;
+  }
+  
+  .song:hover {
+    background-color: rgba(96, 0, 40, 0.1);
+  }
+  
