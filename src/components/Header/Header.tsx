@@ -5,9 +5,9 @@ import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
 
 const links = [
-    { link: '/learn', label: 'Playlists' },
-    { link: '/about', label: 'Spotify' },
-    { link: '/pricing', label: 'Youtube' },
+    { link: '/Playlist', label: 'Playlists' },
+    { link: '/Spotify', label: 'Spotify' },
+    { link: '/Youtube', label: 'Youtube' },
 
 ];
 
