@@ -1,29 +1,37 @@
 import { ActionIcon, Center, Group, rem, Slider, Stack } from '@mantine/core';
 import { IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward, IconPlayerPause } from '@tabler/icons-react';
 import classes from './Footer.module.css';
-import { useState, useEffect  } from 'react';
+import { useState, useEffect } from 'react';
+import ReactPlayer from 'react-player'
+
+
+export function Footer({ songUrl }: { songUrl: string | null })  {
 
 
 
-export function Footer() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
 
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        setProgress((prev) => (prev < 100 ? prev + 1 : 0));
+      }, 1000); // Co sekundę przesuwa o 1%
 
+      return () => clearInterval(interval); // Czyszczenie interwału po zatrzymaniu
+    }
+  }, [isPlaying]);
 
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
+  return (
+    <div className={classes.footer}>
 
-    useEffect(() => {
-        if (isPlaying) {
-          const interval = setInterval(() => {
-            setProgress((prev) => (prev < 100 ? prev + 1 : 0));
-          }, 1000); // Co sekundę przesuwa o 1%
-    
-          return () => clearInterval(interval); // Czyszczenie interwału po zatrzymaniu
-        }
-      }, [isPlaying]);
-
-    return (
-        <div className={classes.footer}>
+      <ReactPlayer
+             url={songUrl || undefined}
+        playing={isPlaying}
+        width="0%"
+        height="0%"
+        onProgress={({ played }) => setProgress(played * 100)} // ← aktualizuje pasek
+      />
       <Stack gap="xs" w="80%">
         {/* Kontrolki */}
         <Center>
@@ -47,8 +55,8 @@ export function Footer() {
             </ActionIcon>
           </Group>
         </Center>
-             {/* Pasek postępu */}
-             <Slider
+        {/* Pasek postępu */}
+        <Slider
           value={progress}
           onChange={setProgress}
           color="white"
@@ -57,6 +65,6 @@ export function Footer() {
           className={classes.slider}
         />
       </Stack>
-        </div>
-    );
+    </div>
+  );
 }

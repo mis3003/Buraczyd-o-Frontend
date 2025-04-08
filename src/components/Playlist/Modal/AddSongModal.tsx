@@ -2,10 +2,16 @@ import { useState } from 'react';
 import { Modal, TextInput, Button, ButtonGroup } from '@mantine/core';
 import { fetchYoutubeTitle } from './YoutubeHandler';
 
+
+interface Song {
+  name: string;
+  url: string;
+}
+
 interface AddSongModalProps {
   opened: boolean;
   onClose: () => void;
-  onAddSong: (song: string) => void;
+  onAddSong: (song: Song) => void; // <-- Zmienione!
 }
 
 export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) {
@@ -22,15 +28,15 @@ const handleYt = () => {
 const handleAdd = async () => {
   let name = songName;
 
-  if (platform === 'youtube') {
-    name = await fetchYoutubeTitle(songURL);
-    setSongName(name); // aktualizujemy state jeśli chcesz
+  if (platform === 'youtube' && !songName.trim()) {
+    name = await fetchYoutubeTitle(songURL); // pobierz nazwę z YouTube
   }
 
   if (!name.trim()) return;
 
-  onAddSong(name);
+  onAddSong({ name, url: songURL }); // teraz przekazujemy oba
   setSongName('');
+  setSongUrl('');
   onClose();
 };
 
