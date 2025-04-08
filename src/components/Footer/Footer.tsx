@@ -1,39 +1,34 @@
 import { ActionIcon, Center, Group, rem, Slider, Stack } from '@mantine/core';
 import { IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward, IconPlayerPause } from '@tabler/icons-react';
 import classes from './Footer.module.css';
-import { useState, useEffect } from 'react';
-import ReactPlayer from 'react-player'
+import { useState, useEffect, useRef } from 'react';
+import ReactPlayer from 'react-player';
 
-
-export function Footer({ songUrl }: { songUrl: string | null })  {
-
-
-
+export function Footer({ songUrl }: { songUrl: string | null }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const playerRef = useRef<ReactPlayer>(null);
 
-  useEffect(() => {
-    if (isPlaying) {
-      const interval = setInterval(() => {
-        setProgress((prev) => (prev < 100 ? prev + 1 : 0));
-      }, 1000); // Co sekundę przesuwa o 1%
-
-      return () => clearInterval(interval); // Czyszczenie interwału po zatrzymaniu
-    }
-  }, [isPlaying]);
+  const handleSeek = (value: number) => {
+    setProgress(value); // Aktualizuj stan suwaka
+    playerRef.current?.seekTo(value / 100, 'fraction'); // Seek do % pozycji
+  };
 
   return (
     <div className={classes.footer}>
-
       <ReactPlayer
-             url={songUrl || undefined}
+        ref={playerRef}
+        url={songUrl || undefined}
         playing={isPlaying}
         width="0%"
         height="0%"
-        onProgress={({ played }) => setProgress(played * 100)} // ← aktualizuje pasek
+        onProgress={({ played }) => {
+          if (!isSeeking) setProgress(played * 100);
+        }}
       />
+
       <Stack gap="xs" w="80%">
-        {/* Kontrolki */}
         <Center>
           <Group gap="md">
             <ActionIcon size="xl" variant="subtle" className={classes.button}>
@@ -55,10 +50,14 @@ export function Footer({ songUrl }: { songUrl: string | null })  {
             </ActionIcon>
           </Group>
         </Center>
-        {/* Pasek postępu */}
+
         <Slider
           value={progress}
-          onChange={setProgress}
+          onChange={handleSeek}
+          onMouseDown={() => setIsSeeking(true)}
+          onMouseUp={() => setIsSeeking(false)}
+          onTouchStart={() => setIsSeeking(true)}
+          onTouchEnd={() => setIsSeeking(false)}
           color="white"
           size="sm"
           radius="xl"
