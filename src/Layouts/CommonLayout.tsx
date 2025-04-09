@@ -9,7 +9,13 @@ import App from "../App";
 
 export const CommonLayout = ({ children }: any) => {
     const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1');
+    const [playingPlaylist, setPlayingPlaylist] = useState('Playlista 1'); 
     const [currentSongUrl, setCurrentSongUrl] = useState<string | null>(null);
+    const [playlist, setPlaylist] = useState<string[]>([]);
+const [currentIndex, setCurrentIndex] = useState(0);
+
+
+
     return (
         <AppShell
             header={{ height: 60 }}
@@ -24,11 +30,22 @@ export const CommonLayout = ({ children }: any) => {
             </AppShell.Navbar>
 
             <AppShell.Main style={{ paddingLeft: 300 }}>
-            <Playlist selected={selectedPlaylist} onSongSelect={setCurrentSongUrl} />
-
+            <Playlist
+  selected={selectedPlaylist}
+  onSongSelect={(url) => {
+    setCurrentSongUrl(url);
+    const index = playlist.indexOf(url);
+    if (index !== -1) setCurrentIndex(index);
+  }}
+  setPlaylist={setPlaylist}
+/>
             </AppShell.Main>
             <AppShell.Footer>
-            <Footer songUrl={currentSongUrl} />
+                <Footer
+                    playlist={playlist}
+                    currentIndex={currentIndex}
+                    setCurrentIndex={setCurrentIndex}
+                />
             </AppShell.Footer>
 
 

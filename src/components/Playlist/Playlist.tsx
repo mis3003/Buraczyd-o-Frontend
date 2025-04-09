@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Title, Stack, Text, Button, Group, ActionIcon } from '@mantine/core';
 import { IconPlus, IconPlayerPlay } from '@tabler/icons-react';
 import { AddSongModal } from './Modal/AddSongModal';
-
 
 interface Song {
   name: string;
@@ -12,9 +11,10 @@ interface Song {
 interface PlaylistProps {
   selected: string;
   onSongSelect: (url: string) => void;
+  setPlaylist: (urls: string[]) => void; // Dodany props
 }
 
-export function Playlist({ selected, onSongSelect }: PlaylistProps) {
+export function Playlist({ selected, onSongSelect, setPlaylist }: PlaylistProps) {
   const [songs, setSongs] = useState<{ [key: string]: Song[] }>({
     'Playlista 1': [],
     'Playlista 2': [
@@ -27,11 +27,23 @@ export function Playlist({ selected, onSongSelect }: PlaylistProps) {
   const [modalOpened, setModalOpened] = useState(false);
 
   const addSong = (song: Song) => {
-    setSongs((prev) => ({
-      ...prev,
-      [selected]: [...(prev[selected] || []), song]
-    }));
+    setSongs((prev) => {
+      const updated = {
+        ...prev,
+        [selected]: [...(prev[selected] || []), song]
+      };
+
+      
+      setPlaylist(updated[selected].map((s) => s.url));
+
+      return updated;
+    });
   };
+
+
+  useEffect(() => {
+    setPlaylist(songs[selected]?.map((s) => s.url) || []);
+  }, [selected]);
 
   return (
     <>
@@ -61,4 +73,3 @@ export function Playlist({ selected, onSongSelect }: PlaylistProps) {
     </>
   );
 }
-
