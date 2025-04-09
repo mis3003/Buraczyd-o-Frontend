@@ -5,7 +5,7 @@ import { MantineProvider } from '@mantine/core';
 function App() {
   return <MantineProvider>
     <CommonLayout>
-      Hej
+     
     </CommonLayout>
   </MantineProvider>;
 }

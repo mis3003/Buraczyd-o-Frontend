@@ -7,49 +7,63 @@ import { useState } from 'react';
 import { Playlist } from "../components/Playlist/Playlist";
 import App from "../App";
 
+interface Song {
+  name: string;
+  url: string;
+}
+
 export const CommonLayout = ({ children }: any) => {
-    const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1');
-    const [playingPlaylist, setPlayingPlaylist] = useState('Playlista 1'); 
-    const [currentSongUrl, setCurrentSongUrl] = useState<string | null>(null);
-    const [playlist, setPlaylist] = useState<string[]>([]);
-const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1'); // ← przeglądana
+  const [playingPlaylist, setPlayingPlaylist] = useState('Playlista 1');   // ← odtwarzana
+  const [playlistData, setPlaylistData] = useState<{ [key: string]: Song[] }>({
+    'Playlista 1': [],
+    'Playlista 2': [
+      { name: 'Piosenka 3', url: 'https://www.youtube.com/watch?v=example3' },
+      { name: 'Piosenka 4', url: 'https://www.youtube.com/watch?v=example4' }
+    ],
+    'Playlista 3': []
+  });
 
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  const handleSongSelect = (playlistName: string, url: string, index: number) => {
+    setPlayingPlaylist(playlistName);
+    setCurrentIndex(index);
+  };
 
-    return (
-        <AppShell
-            header={{ height: 60 }}
-            navbar={{ width: 250, breakpoint: 'sm' }} // Dodany breakpoint
-        >
+  const handleAddSong = (song: Song) => {
+    setPlaylistData(prev => ({
+      ...prev,
+      [selectedPlaylist]: [...(prev[selectedPlaylist] || []), song]
+    }));
+  };
 
-            <AppShell.Header>
-                <Header />
-            </AppShell.Header>
-            <AppShell.Navbar>
-                <Sidebar onSelect={setSelectedPlaylist} />
-            </AppShell.Navbar>
+  return (
+    <AppShell header={{ height: 60 }} navbar={{ width: 250 ,breakpoint:'sm'}}>
+      <AppShell.Header>
+        <Header />
+      </AppShell.Header>
 
-            <AppShell.Main style={{ paddingLeft: 300 }}>
-            <Playlist
-  selected={selectedPlaylist}
-  onSongSelect={(url) => {
-    setCurrentSongUrl(url);
-    const index = playlist.indexOf(url);
-    if (index !== -1) setCurrentIndex(index);
-  }}
-  setPlaylist={setPlaylist}
-/>
-            </AppShell.Main>
-            <AppShell.Footer>
-                <Footer
-                    playlist={playlist}
-                    currentIndex={currentIndex}
-                    setCurrentIndex={setCurrentIndex}
-                />
-            </AppShell.Footer>
+      <AppShell.Navbar>
+        <Sidebar onSelect={setSelectedPlaylist} />
+      </AppShell.Navbar>
 
+      <AppShell.Main style={{ paddingLeft: 300 }}>
+        <Playlist
+          selected={selectedPlaylist}
+          songs={playlistData[selectedPlaylist] || []}
+          onAddSong={handleAddSong}
+          onSongSelect={(url, index) => handleSongSelect(selectedPlaylist, url, index)}
+        />
+      </AppShell.Main>
 
-
-        </AppShell>
-    );
+      <AppShell.Footer>
+        <Footer
+          playlist={(playlistData[playingPlaylist] || []).map(song => song.url)}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
+      </AppShell.Footer>
+    </AppShell>
+  );
 };
