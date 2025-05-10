@@ -15,7 +15,8 @@
   align-items: center;
 }
 body {
-  padding-top: 50px; /* Dopasuj do wysokości footera */
+  padding-top: 56px; /* Account for header height */
+  padding-bottom: 80px; /* Account for footer height */
 }
 
 

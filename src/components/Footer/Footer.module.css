@@ -9,17 +9,18 @@
     justify-content: center;
     align-items: center;
     border-top: 1px solid #333;
+    z-index: 1001; /* Higher than header to ensure visibility */
   }
-  
+
   .button {
     color: gray;
     transition: color 0.2s ease-in-out;
   }
-  
+
   .button:hover {
     color: white;
   }
-  
+
   .playButton {
     background-color: white;
     color: #730029;
@@ -29,12 +30,24 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .playButton:hover {
     background-color: lightgray;
   }
-  
+
   .slider {
     margin-top: 5px;
   }
-  
+
+  /* Hide Spotify player iframe */
+  [data-spotify-player],
+  iframe[src*="spotify"],
+  iframe[src*="scdn.co"],
+  iframe[id*="spotify"] {
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }

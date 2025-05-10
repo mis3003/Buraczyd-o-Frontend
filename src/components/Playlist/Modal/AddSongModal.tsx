@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, TextInput, Button, ButtonGroup } from '@mantine/core';
 import { fetchYoutubeTitle } from './YoutubeHandler';
+import { fetchSpotifyTitle } from './SpotifyHandler';
 
 
 interface Song {
@@ -18,7 +19,7 @@ export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) 
   const [songURL, setSongUrl]= useState('')
   const [songName, setSongName] = useState('');
   const [platform, setPlatform] = useState<'youtube' | 'spotify'>('youtube');
-  
+
 const handleYt = () => {
   const title=fetchYoutubeTitle(songURL)
   fetchYoutubeTitle(songURL).then(setSongName);
@@ -28,8 +29,12 @@ const handleYt = () => {
 const handleAdd = async () => {
   let name = songName;
 
-  if (platform === 'youtube' && !songName.trim()) {
-    name = await fetchYoutubeTitle(songURL); // pobierz nazwę z YouTube
+  if (!songName.trim()) {
+    if (platform === 'youtube') {
+      name = await fetchYoutubeTitle(songURL); // pobierz nazwę z YouTube
+    } else if (platform === 'spotify') {
+      name = await fetchSpotifyTitle(songURL); // pobierz nazwę ze Spotify
+    }
   }
 
   if (!name.trim()) return;
