@@ -12,30 +12,8 @@ interface Song {
 }
 
 export const MainLayout = () => {
-  const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1'); // ← przeglądana
-  const [playingPlaylist, setPlayingPlaylist] = useState('Playlista 1');   // ← odtwarzana
-  const [playlistData, setPlaylistData] = useState<{ [key: string]: Song[] }>({
-    'Playlista 1': [],
-    'Playlista 2': [
-      { name: 'Piosenka 3', url: 'https://www.youtube.com/watch?v=example3' },
-      { name: 'Piosenka 4', url: 'https://www.youtube.com/watch?v=example4' }
-    ],
-    'Playlista 3': []
-  });
-
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleSongSelect = (playlistName: string, url: string, index: number) => {
-    setPlayingPlaylist(playlistName);
-    setCurrentIndex(index);
-  };
-
-  const handleAddSong = (song: Song) => {
-    setPlaylistData(prev => ({
-      ...prev,
-      [selectedPlaylist]: [...(prev[selectedPlaylist] || []), song]
-    }));
-  };
+  const [playingPlaylist, setPlayingPlaylist] = useState('Playlista 1');
 
   return (
     <AppShell header={{ height: 60 }} navbar={{ width: 250, breakpoint: 'sm' }}>
@@ -44,7 +22,7 @@ export const MainLayout = () => {
       </AppShell.Header>
 
       <AppShell.Navbar>
-        <Sidebar onSelect={setSelectedPlaylist} />
+        <Sidebar onSelect={setPlayingPlaylist} />
       </AppShell.Navbar>
 
       <AppShell.Main style={{ paddingLeft: 300 }}>
@@ -53,7 +31,7 @@ export const MainLayout = () => {
 
       <AppShell.Footer>
         <Footer
-          playlist={(playlistData[playingPlaylist] || []).map(song => song.url)}
+          playlist={[]}
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
         />

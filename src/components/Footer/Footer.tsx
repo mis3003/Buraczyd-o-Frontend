@@ -1,7 +1,7 @@
-import { ActionIcon, Center, Group, rem, Slider, Stack } from '@mantine/core';
+import { ActionIcon, Center, Group, Slider, Stack } from '@mantine/core';
 import { IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward, IconPlayerPause } from '@tabler/icons-react';
 import classes from './Footer.module.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ReactPlayer from 'react-player';
 import { initSpotifyPlayer, playSpotifyTrack, extractSpotifyTrackId, SpotifyPlayer } from '../Playlist/Modal/SpotifyHandler';
 
@@ -50,7 +50,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
       // Cleanup
       spotifyPlayer?.disconnect();
     };
-  }, []);
+  }, [spotifyPlayer]);
 
   // Handle song changes
   useEffect(() => {
@@ -78,14 +78,14 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
     }
   }, [currentSong, isSpotifyUrl, spotifyPlayer]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentIndex < playlist.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else if (isSpotifyUrl && spotifyPlayer) {
       // If we're at the end of the playlist and using Spotify, try to use Spotify's next track
       spotifyPlayer.nextTrack().catch(err => console.error('Error skipping to next Spotify track:', err));
     }
-  };
+  }, [currentIndex, playlist.length, isSpotifyUrl, spotifyPlayer, setCurrentIndex]); // Added 'setCurrentIndex' to dependencies
 
   // Track Spotify playback progress
   useEffect(() => {

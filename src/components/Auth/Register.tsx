@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, PasswordInput, Button, Paper, Title, Text, Container, Group, Anchor, Loader } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Paper, Title, Text, Container, Anchor } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../../services/authService';
 
@@ -104,10 +104,10 @@ export function Register() {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
-          <Button 
-            fullWidth 
-            mt="xl" 
-            type="submit" 
+          <Button
+            fullWidth
+            mt="xl"
+            type="submit"
             style={{ backgroundColor: '#730029' }}
             loading={loading}
             disabled={loading}

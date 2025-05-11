@@ -1,4 +1,5 @@
 // Authentication service for handling login, registration, and token management
+import Cookies from 'js-cookie';
 
 // Types for authentication
 export interface LoginCredentials {
@@ -32,10 +33,11 @@ const TOKEN_KEY = 'auth_token';
  * @param credentials User credentials (email and password)
  * @returns Promise with auth response
  */
-export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+export const login = async (credentials: LoginCredentials): Promise<AuthResponse | { error: string }> => {
   try {
     const response = await fetch(LOGIN_URL, {
       method: 'POST',
+      credentials: 'include', // <== kluczowe: pozwala przesłać i zapisać JSESSIONID
       headers: {
         'Content-Type': 'application/json',
       },
@@ -50,11 +52,10 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
       };
     }
 
-    // If login is successful, store the token
-    if (data.token) {
-      localStorage.setItem(TOKEN_KEY, data.token);
-    }
+    // Sesja została zapisana — nie potrzebujesz tokena
+    console.log('Login successful, user data:', data);
 
+    // (opcjonalnie) przekierowanie lub ustawienie stanu logowania
     return data;
   } catch (error) {
     return {
@@ -101,7 +102,7 @@ export const register = async (credentials: RegisterCredentials): Promise<AuthRe
  * @returns The authentication token or null if not found
  */
 export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+  return Cookies.get(TOKEN_KEY) || null; // Retrieve token from cookies
 };
 
 /**
@@ -116,5 +117,13 @@ export const isAuthenticated = (): boolean => {
  * Logout the user by removing the token
  */
 export const logout = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
+  Cookies.remove(TOKEN_KEY); // Remove token from cookies
+};
+
+// Add a function to handle redirection after login
+/**
+ * Redirect the user to the home page after successful login
+ */
+const redirectToHome = (): void => {
+  window.location.href = '/'; // Redirect to the home page
 };

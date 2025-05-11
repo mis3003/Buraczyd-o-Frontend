@@ -5,7 +5,6 @@ import { Footer } from "../components/Footer/Footer";
 import { Sidebar } from "../components/Sidebar/Sidebar";
 import { useState } from 'react';
 import { Playlist } from "../components/Playlist/Playlist";
-import App from "../App";
 
 interface Song {
   name: string;
@@ -39,7 +38,7 @@ export const CommonLayout = ({ children }: any) => {
   };
 
   return (
-    <AppShell header={{ height: 60 }} navbar={{ width: 250 ,breakpoint:'sm'}}>
+    <AppShell header={{ height: 60 }} navbar={{ width: 250, breakpoint: 'sm' }}>
       <AppShell.Header>
         <Header />
       </AppShell.Header>

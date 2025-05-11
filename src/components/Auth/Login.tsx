@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { TextInput, PasswordInput, Button, Paper, Title, Text, Container, Group, Anchor, Loader } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Paper, Title, Text, Container, Group, Anchor } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { login as loginUser, isAuthenticated } from '../../services/authService';
+import { login as loginUser } from '../../services/authService';
+import { useIsLogged } from '../../hooks/useIsLogged';
 
 export function Login() {
-  const [login, setLogin] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export function Login() {
     setSuccess('');
 
     // Basic validation
-    if (!login || !password) {
+    if (!username || !password) {
       setError('Please fill in all fields');
       return;
     }
@@ -26,7 +27,7 @@ export function Login() {
       setLoading(true);
 
       // Call the login function from authService
-      const response = await loginUser({ login, password });
+      const response = await loginUser({ login: username, password });
 
       if (response.error) {
         setError(response.error);
@@ -44,6 +45,12 @@ export function Login() {
       setLoading(false);
     }
   };
+
+  const dupa = useIsLogged();
+  console.log('Is logged:', dupa);
+
+  // Add a function to handle the sign-in button click
+
 
   return (
     <Container size={420} my={40}>
@@ -66,8 +73,8 @@ export function Login() {
             label="Username"
             placeholder="Your username"
             required
-            value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
 
           <PasswordInput
@@ -81,14 +88,14 @@ export function Login() {
 
           <Group justify="space-between" mt="lg">
             <Anchor component="button" size="sm" style={{ color: '#730029' }}>
-              Forgot password?
+              Forgot password
             </Anchor>
           </Group>
 
-          <Button 
-            fullWidth 
-            mt="xl" 
-            type="submit" 
+          <Button
+            fullWidth
+            mt="xl"
+            type="submit"
             style={{ backgroundColor: '#730029' }}
             loading={loading}
             disabled={loading}

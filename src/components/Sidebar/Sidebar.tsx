@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ScrollArea, Stack, Title, Text } from '@mantine/core';
 import classes from './Sidebar.module.css';
 

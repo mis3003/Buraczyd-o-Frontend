@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TextInput, Burger, Container, Group, Button } from '@mantine/core';
+import { TextInput, Button, Container, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -10,26 +10,15 @@ const links = [
 ];
 
 export function Header() {
-    const [opened, { toggle }] = useDisclosure(false);
-    const [active, setActive] = useState(links[0].link);
+    const [active] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // const items = links.map((link) => (
-    //     <a
-    //         key={link.label}
-    //         href={link.link}
-    //         className={classes.link}
-    //         data-active={active === link.link || undefined}
-    //         onClick={(event) => {
-    //             event.preventDefault();
-    //             setActive(link.link);
-    //             navigate(`/app${link.link.toLowerCase()}`);
-    //         }}
-    //     >
-    //         {link.label}
-    //     </a>
-    // ));
+    const handleSearch = () => {
+        // Handle search logic here
+        console.log('Searching for:', searchQuery);
+    };
 
     return (
         <header className={classes.header}>
@@ -43,7 +32,7 @@ export function Header() {
                         onClick={async () => {
                             try {
                                 // Wysyłanie żądania do backendu
-                                const response =await fetch("http://localhost:8080/api/spotify/authorize", {
+                                const response = await fetch("http://localhost:8080/api/spotify/authorize", {
                                     method: "GET",
                                     credentials: "include"
                                 });
@@ -62,26 +51,21 @@ export function Header() {
                     >
 
 
-                       Zaloguj do Spotify
+                        Zaloguj do Spotify
                     </Button>
                 </Group>
                 <Group gap={10}>
                     <TextInput
                         placeholder="Wprowadz link"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.currentTarget.value)}
                     />
-                    {/*<Button */}
-                    {/*    style={{ backgroundColor: '#730029' }}*/}
-                    {/*    onClick={() => navigate('/login')}*/}
-                    {/*>*/}
-                    {/*    Login*/}
-                    {/*</Button>*/}
-                    {/*<Button */}
-                    {/*    variant="outline"*/}
-                    {/*    style={{ borderColor: '#730029', color: '#730029' }}*/}
-                    {/*    onClick={() => navigate('/register')}*/}
-                    {/*>*/}
-                    {/*    Register*/}
-                    {/*</Button>*/}
+                    <Button
+                        onClick={handleSearch}
+                        style={{ backgroundColor: '#730029' }}
+                    >
+                        Szukaj
+                    </Button>
                 </Group>
 
             </Container>
