@@ -10,6 +10,7 @@ import { YoutubePage } from './components/Youtube';
 import PrivateRoute from './Routing/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import SpotifySuccessPage from './components/Spotify/SpotifySuccessPage';
+import SpotifyTester from "./spotiftTest/SpotifyTester";
 
 function App() {
   return (
@@ -32,7 +33,9 @@ function App() {
               <Route path="playlist" element={<PlaylistPage />} />
               <Route path="spotify" element={<SpotifyPage />} />
               <Route path="youtube" element={<YoutubePage />} />
+
             </Route>
+            < Route path="/spotify-test" element={<SpotifyTester />} />
             <Route path="/spotify/succes" element={<SpotifySuccessPage />} />
           </Routes>
         </BrowserRouter>

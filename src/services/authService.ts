@@ -37,7 +37,7 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
   try {
     const response = await fetch(LOGIN_URL, {
       method: 'POST',
-      credentials: 'include', // <== kluczowe: pozwala przesłać i zapisać JSESSIONID
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },

@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { Playlist } from './Playlist';
+import {Song} from "../../types/Song";
 
-interface Song {
-  name: string;
-  url: string;
-}
+
 
 export function PlaylistPage() {
   const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1');
   const [playlistData, setPlaylistData] = useState<{ [key: string]: Song[] }>({
     'Playlista 1': [],
     'Playlista 2': [
-      { name: 'Piosenka 3', url: 'https://www.youtube.com/watch?v=example3' },
-      { name: 'Piosenka 4', url: 'https://www.youtube.com/watch?v=example4' }
+      { name: 'Piosenka 3',source:"youtube", url: 'https://www.youtube.com/watch?v=example3' },
+      { name: 'Piosenka 4', source:"spotify",url: 'https://www.youtube.com/watch?v=example4' }
     ],
     'Playlista 3': []
   });

@@ -36,7 +36,7 @@ export function Login() {
         // Redirect to main application after a short delay
         setTimeout(() => {
           navigate('/app/playlist');
-        }, 1000);
+        }, 10);
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
@@ -45,12 +45,6 @@ export function Login() {
       setLoading(false);
     }
   };
-
-  const dupa = useIsLogged();
-  console.log('Is logged:', dupa);
-
-  // Add a function to handle the sign-in button click
-
 
   return (
     <Container size={420} my={40}>

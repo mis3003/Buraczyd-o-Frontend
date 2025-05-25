@@ -2,11 +2,9 @@ import { useState } from 'react';
 import { Title, Stack, Text, Button, Group, ActionIcon } from '@mantine/core';
 import { IconPlus, IconPlayerPlay } from '@tabler/icons-react';
 import { AddSongModal } from './Modal/AddSongModal';
+import {Song} from "../../types/Song";
 
-interface Song {
-  name: string;
-  url: string;
-}
+
 
 interface PlaylistProps {
   selected: string;

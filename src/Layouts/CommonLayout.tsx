@@ -5,21 +5,15 @@ import { Footer } from "../components/Footer/Footer";
 import { Sidebar } from "../components/Sidebar/Sidebar";
 import { useState } from 'react';
 import { Playlist } from "../components/Playlist/Playlist";
+import {Song} from "../types/Song";
 
-interface Song {
-  name: string;
-  url: string;
-}
 
 export const CommonLayout = ({ children }: any) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1'); // ← przeglądana
   const [playingPlaylist, setPlayingPlaylist] = useState('Playlista 1');   // ← odtwarzana
   const [playlistData, setPlaylistData] = useState<{ [key: string]: Song[] }>({
     'Playlista 1': [],
-    'Playlista 2': [
-      { name: 'Piosenka 3', url: 'https://www.youtube.com/watch?v=example3' },
-      { name: 'Piosenka 4', url: 'https://www.youtube.com/watch?v=example4' }
-    ],
+    'Playlista 2': [],
     'Playlista 3': []
   });
 
@@ -58,7 +52,7 @@ export const CommonLayout = ({ children }: any) => {
 
       <AppShell.Footer>
         <Footer
-          playlist={(playlistData[playingPlaylist] || []).map(song => song.url)}
+          playlist={(playlistData[playingPlaylist] || []).map(song => song)}
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
         />

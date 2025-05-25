@@ -11,7 +11,7 @@ export const useIsLogged = () => {
           credentials: 'include',
         });
         console.log('Response status:', res.status);
-        console.log('Response body:', await res.text());
+        // console.log('Response body:', await res.text());
         if (res.ok) {
           setIsLogged(true);
         } else {
