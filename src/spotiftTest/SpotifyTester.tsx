@@ -6,7 +6,7 @@ import WebPlayback from "../components/WebPlayback/Webplayback";
 
 export default function SpotifyTester() {
     const [token, setToken] = useState<string | null>(null);
-const url="https://open.spotify.com/track/5Rq31wesx2Y0BxOuXSdGa3?si=25fd0b6a4554409d"
+const url="https://open.spotify.com/track/2WfaOiMkCvy7F5fcp2zZ8L?si=dcaa9b1b60804d77"
 
     useEffect(() => {
         const getToken = async () => {
@@ -30,8 +30,8 @@ const url="https://open.spotify.com/track/5Rq31wesx2Y0BxOuXSdGa3?si=25fd0b6a4554
                     <Button>⏮ Poprzedni</Button>
                     <Button>⏭ Następny</Button>
 
-                    {/* Tu wstawiamy WebPlayback */}
-                    <WebPlayback token={token} url={url} />
+
+                    {/*<WebPlayback token={token} url={url} />*/}
                 </Stack>
             )}
         </div>

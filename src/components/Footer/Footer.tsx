@@ -1,11 +1,16 @@
-import {ActionIcon, Center, Group, Slider, Stack, Text} from '@mantine/core';
-import { IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward, IconPlayerPause } from '@tabler/icons-react';
+import { ActionIcon, Center, Group, Slider, Stack, Text } from '@mantine/core';
+import {
+  IconPlayerPlay,
+  IconPlayerSkipBack,
+  IconPlayerSkipForward,
+  IconPlayerPause
+} from '@tabler/icons-react';
 import classes from './Footer.module.css';
-import { useState, useRef, useEffect } from 'react'; // Dodaj useEffect
+import { useState, useRef, useEffect } from 'react';
 import ReactPlayer from 'react-player';
-import {Song} from "../../types/Song";
-import WebPlayback from "../WebPlayback/Webplayback";
-import {fetchSpotifyToken} from "../../api/spotifyApi";
+import { Song } from '../../types/Song';
+import WebPlayback from '../WebPlayback/Webplayback';
+import { fetchSpotifyToken } from '../../api/spotifyApi';
 
 interface FooterProps {
   playlist: Song[];
@@ -17,11 +22,48 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
-  const [source, setSource] = useState<"youtube" | "spotify">("youtube");
+  const [source, setSource] = useState<'youtube' | 'spotify'>('youtube');
   const playerRef = useRef<ReactPlayer>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [volume, setVolume] = useState(0.8);
+  const [duration, setDuration] = useState(0); // Track duration in milliseconds for Spotify, seconds for YouTube
+  const [spotifyPlayer, setSpotifyPlayer] = useState<Spotify.Player | null>(null);
   const currentSong = playlist[currentIndex] ?? null;
 
+  // Handle Spotify seeking using player.seek()
+  const handleSeekSpotify = async (value: number) => {
+    if (!spotifyPlayer || duration === 0) return;
+    const positionMs = (value / 100) * duration;
+    try {
+      await spotifyPlayer.seek(positionMs);
+      console.log(`[Spotify] Seeked to ${positionMs}ms`);
+    } catch (err) {
+      console.error('Failed to seek in Spotify:', err);
+    }
+  };
+
+  // Handle YouTube seeking
+  const handleSeekYouTube = (value: number) => {
+    if (playerRef.current && duration > 0) {
+      const seekTime = (value / 100) * duration;
+      playerRef.current.seekTo(seekTime, 'seconds');
+    }
+  };
+
+  // Handle progress updates from Spotify
+  const handleSpotifyProgress = (progressPercent: number, trackDuration: number) => {
+    if (!isSeeking) {
+      setProgress(Math.min(progressPercent, 100)); // Ensure progress doesn't exceed 100%
+      if (trackDuration > 0) {
+        setDuration(trackDuration);
+      }
+
+      // Check if track ended
+      if (progressPercent >= 99.5 && isPlaying) {
+        handleNext();
+      }
+    }
+  };
 
   useEffect(() => {
     const getToken = async () => {
@@ -31,71 +73,62 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
     getToken();
   }, []);
 
-  const handleNext = () => {
-
-    if (currentIndex < playlist.length - 1) {
-
-
-      setSource(playlist[currentIndex+1].source);
-
-      setCurrentIndex(currentIndex + 1);
-
+  useEffect(() => {
+    if (currentSong) {
+      setSource(currentSong.source);
       setProgress(0);
+      setDuration(0);
+      if (currentSong.source === 'youtube') {
+        playerRef.current?.seekTo(0, 'fraction');
+      }
+    }
+  }, [currentIndex, currentSong]);
+
+  const handleNext = () => {
+    if (currentIndex < playlist.length - 1) {
+      setCurrentIndex(currentIndex + 1);
       setIsPlaying(true);
-
     } else {
-
       setIsPlaying(false);
       setCurrentIndex(0);
-      setProgress(0)
     }
   };
-
-
 
   const handlePrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      setProgress(0);
-      setIsPlaying(true); // Automatycznie odtwarzaj poprzednią piosenkę
+      setIsPlaying(true);
     } else {
-      // Opcjonalnie: co zrobić, gdy jesteś na pierwszej piosence i klikasz 'poprzedni'
-      // Możesz np. przejść na koniec playlisty
       setCurrentIndex(playlist.length - 1);
-      setProgress(0);
       setIsPlaying(true);
     }
   };
 
   const handleSeek = (value: number) => {
     setProgress(value);
-    // Użyj playerRef.current?.seekTo() tylko wtedy, gdy suwak jest aktywnie przeciągany
-    // aby uniknąć skakania podczas aktualizacji onProgress
   };
 
-  // Użyj useEffect do resetowania progressu i stanu odtwarzania po zmianie piosenki
-  useEffect(() => {
-    setProgress(0); // Zresetuj suwak, gdy currentIndex się zmieni
-    // Jeśli chcesz, by piosenka zaczęła grać automatycznie po zmianie indexu, upewnij się, że isPlaying jest true
-    if (currentSong && isPlaying) {
-      // Możesz dodać sprawdzenie, czy player jest gotowy, jeśli napotkasz problemy z automatycznym startem
-      playerRef.current?.seekTo(0, 'fraction'); // Upewnij się, że zaczyna od początku
+  const handleSeekEnd = () => {
+    setIsSeeking(false);
+    if (source === 'youtube') {
+      handleSeekYouTube(progress);
+    } else if (source === 'spotify') {
+      handleSeekSpotify(progress);
     }
-  }, [currentIndex, currentSong, isPlaying]);
-
+  };
 
   return (
       <div className={classes.footer}>
-
         {currentSong ? (
-            source === "youtube" ? (
+            source === 'youtube' ? (
                 <ReactPlayer
                     ref={playerRef}
                     url={currentSong.url}
                     playing={isPlaying}
                     width="0%"
                     height="0%"
-                    onProgress={({ played }) => {
+                    volume={volume}
+                    onProgress={({ played, playedSeconds }) => {
                       if (!isSeeking) {
                         const newProgress = played * 100;
                         setProgress(newProgress);
@@ -104,18 +137,30 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
                         }
                       }
                     }}
+                    onDuration={(dur) => setDuration(dur)} // Set duration in seconds for YouTube
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
-                    onError={(e) => console.error('Błąd odtwarzania:', e)}
+                    onError={e => console.error('Błąd odtwarzania:', e)}
                 />
-            ) : source === "spotify" && token ? (
-                <WebPlayback token={token} url={currentSong.url} />
+            ) : source === 'spotify' && token ? (
+                <>
+                  <WebPlayback
+                      token={token}
+                      trackUri={currentSong.url}
+                      isPlaying={isPlaying}
+                      onTrackEnd={handleNext}
+                      volume={volume}
+                      onProgressUpdate={handleSpotifyProgress}
+                      onPlayerReady={setSpotifyPlayer}
+                  />
+                </>
             ) : (
                 <Text>Brak dostępnego źródła</Text>
             )
         ) : (
             <Text>Brak wybranego utworu</Text>
         )}
+
         <Stack gap="xs" w="80%">
           <Center>
             <Group gap="md">
@@ -143,19 +188,20 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
               value={progress}
               onChange={handleSeek}
               onMouseDown={() => setIsSeeking(true)}
-              onMouseUp={() => {
-                setIsSeeking(false);
-                // Po zwolnieniu myszy, ustaw pozycję odtwarzania
-                playerRef.current?.seekTo(progress / 100, 'fraction');
-              }}
+              onMouseUp={handleSeekEnd}
               onTouchStart={() => setIsSeeking(true)}
-              onTouchEnd={() => {
-                setIsSeeking(false);
-                // Po zwolnieniu palca, ustaw pozycję odtwarzania
-                playerRef.current?.seekTo(progress / 100, 'fraction');
-              }}
+              onTouchEnd={handleSeekEnd}
               color="white"
               size="sm"
+              radius="xl"
+              className={classes.slider}
+          />
+
+          <Slider
+              value={volume * 100}
+              onChange={value => setVolume(value / 100)}
+              color="gray"
+              size="xs"
               radius="xl"
               className={classes.slider}
           />
