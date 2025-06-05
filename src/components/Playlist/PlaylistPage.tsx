@@ -1,38 +1,96 @@
-import React, { useState } from 'react';
-import { Playlist } from './Playlist';
-import {Song} from "../../types/Song";
-
-
+import React, { useEffect, useState } from 'react';
+import { Playlist as PlaylistComponent } from './Playlist';
+import { Playlist } from '../../types/Playlist'; // Import the data interface, not PlaylistProps
+import { CreateSongRequest, Song } from '../../types/Song';
+import { getUserPlaylistsWithSongs } from '../../services/playlistService';
+import { createSong } from '../../services/songService';
 
 export function PlaylistPage() {
-  const [selectedPlaylist, setSelectedPlaylist] = useState('Playlista 1');
-  const [playlistData, setPlaylistData] = useState<{ [key: string]: Song[] }>({
-    'Playlista 1': [],
-    'Playlista 2': [
-      { name: 'Piosenka 3',source:"youtube", url: 'https://www.youtube.com/watch?v=example3' },
-      { name: 'Piosenka 4', source:"spotify",url: 'https://www.youtube.com/watch?v=example4' }
-    ],
-    'Playlista 3': []
-  });
+  // Now using the correct Playlist data interface
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddSong = (song: Song) => {
-    setPlaylistData(prev => ({
-      ...prev,
-      [selectedPlaylist]: [...(prev[selectedPlaylist] || []), song]
-    }));
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      try {
+        console.log('Fetching playlists');
+        setLoading(true);
+        setError(null);
+
+        const data = await getUserPlaylistsWithSongs();
+
+        setPlaylists(data);
+        if (data.length > 0 && data[0].id) {
+          setSelectedPlaylistId(data[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch playlists:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlaylists();
+  }, []);
+
+  const handleAddSong = async (songRequest: CreateSongRequest) => {
+    if (!selectedPlaylistId) return;
+
+    try {
+      // Create the song object with playlistId for the API call
+      const songWithPlaylistId: Song = {
+        ...songRequest,
+        playlistId: selectedPlaylistId
+      };
+
+      // Call your API to create the song
+      const createdSong = await createSong(songWithPlaylistId);
+
+      // Update local state
+      setPlaylists(prev =>
+          prev.map(playlist =>
+              playlist.id === selectedPlaylistId
+                  ? { ...playlist, songs: [...(playlist.songs || []), createdSong] }
+                  : playlist
+          )
+      );
+    } catch (error) {
+      console.error('Error adding song:', error);
+      alert('Błąd podczas dodawania piosenki');
+    }
   };
 
   const handleSongSelect = (url: string, index: number) => {
-    // In a real app, this would trigger playback
     console.log(`Playing song at index ${index}: ${url}`);
+    // Add your song playing logic here
   };
 
-  return (
-    <Playlist
-      selected={selectedPlaylist}
-      songs={playlistData[selectedPlaylist] || []}
-      onAddSong={handleAddSong}
-      onSongSelect={handleSongSelect}
-    />
+  if (loading) {
+    return <p>Ładowanie playlist...</p>;
+  }
+
+  if (error) {
+    return <p>Błąd: {error}</p>;
+  }
+
+  if (playlists.length === 0) {
+    return <p>Brak playlist</p>;
+  }
+
+  const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
+
+  return selectedPlaylist ? (
+      <PlaylistComponent
+          id={selectedPlaylist.id}
+          selected={selectedPlaylist.name} // Now this works because selectedPlaylist is of type Playlist
+          songs={selectedPlaylist.songs || []}
+          onAddSong={handleAddSong}
+          onSongSelect={handleSongSelect}
+      />
+  ) : (
+      <p>Nie znaleziono wybranej playlisty</p>
   );
 }

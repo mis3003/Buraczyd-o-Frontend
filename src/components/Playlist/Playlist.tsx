@@ -3,15 +3,10 @@ import { Title, Stack, Text, Button, Group, ActionIcon } from '@mantine/core';
 import { IconPlus, IconPlayerPlay } from '@tabler/icons-react';
 import { AddSongModal } from './Modal/AddSongModal';
 import {Song} from "../../types/Song";
+import {PlaylistProps} from "../../types/Playlist";
 
 
 
-interface PlaylistProps {
-  selected: string;
-  songs: Song[];
-  onAddSong: (song: Song) => void;
-  onSongSelect: (url: string, index: number) => void;
-}
 
 export function Playlist({ selected, songs, onAddSong, onSongSelect }: PlaylistProps) {
   const [modalOpened, setModalOpened] = useState(false);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { CommonLayout, MainLayout } from './Layouts';
+import { CommonLayout } from './Layouts';
 import { Login, Register } from './components/Auth';
 import { Home } from './components/Home';
 import { PlaylistPage } from './components/Playlist';

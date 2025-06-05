@@ -10,7 +10,7 @@ import { useState, useRef, useEffect } from 'react';
 import ReactPlayer from 'react-player';
 import { Song } from '../../types/Song';
 import WebPlayback from '../WebPlayback/Webplayback';
-import { fetchSpotifyToken } from '../../api/spotifyApi';
+import { fetchSpotifyToken } from '../../services/spotifyService';
 
 interface FooterProps {
   playlist: Song[];
@@ -155,35 +155,43 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
                   />
                 </>
             ) : (
-                <Text>Brak dostępnego źródła</Text>
+                <Text size="sm" c="white">Brak dostępnego źródła</Text>
             )
         ) : (
-            <Text>Brak wybranego utworu</Text>
+            <Text size="sm" c="white">Brak wybranego utworu</Text>
         )}
 
-        <Stack gap="xs" w="80%">
-          <Center>
-            <Group gap="md">
-              <ActionIcon size="xl" variant="subtle" onClick={handlePrev}>
-                <IconPlayerSkipBack size={24} />
-              </ActionIcon>
+        <div className={classes.controls}>
+          <ActionIcon
+              size="lg"
+              variant="subtle"
+              onClick={handlePrev}
+              c="white"
+          >
+            <IconPlayerSkipBack size={20} />
+          </ActionIcon>
 
-              <ActionIcon
-                  size="xl"
-                  variant="filled"
-                  radius="xl"
-                  className={classes.playButton}
-                  onClick={() => setIsPlaying(!isPlaying)}
-              >
-                {isPlaying ? <IconPlayerPause size={24} /> : <IconPlayerPlay size={24} />}
-              </ActionIcon>
+          <ActionIcon
+              size="xl"
+              variant="filled"
+              radius="xl"
+              className={classes.playButton}
+              onClick={() => setIsPlaying(!isPlaying)}
+          >
+            {isPlaying ? <IconPlayerPause size={24} /> : <IconPlayerPlay size={24} />}
+          </ActionIcon>
 
-              <ActionIcon size="xl" variant="subtle" onClick={handleNext}>
-                <IconPlayerSkipForward size={24} />
-              </ActionIcon>
-            </Group>
-          </Center>
+          <ActionIcon
+              size="lg"
+              variant="subtle"
+              onClick={handleNext}
+              c="white"
+          >
+            <IconPlayerSkipForward size={20} />
+          </ActionIcon>
+        </div>
 
+        <div className={classes.sliderContainer}>
           <Slider
               value={progress}
               onChange={handleSeek}
@@ -203,9 +211,9 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
               color="gray"
               size="xs"
               radius="xl"
-              className={classes.slider}
+              className={`${classes.slider} ${classes.volumeSlider}`}
           />
-        </Stack>
+        </div>
       </div>
   );
 }

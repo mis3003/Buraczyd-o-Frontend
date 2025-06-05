@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Text, Stack } from '@mantine/core';
-import { fetchSpotifyToken } from '../api/spotifyApi';
+import { fetchSpotifyToken } from '../services/spotifyService';
 import WebPlayback from "../components/WebPlayback/Webplayback";
 
 
