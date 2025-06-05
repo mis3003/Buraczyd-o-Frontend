@@ -1,12 +1,12 @@
 import {CreateSongRequest, Song} from "./Song";
 
 // types/Playlist.ts
-export interface Playlist {          // ← Data from API
-    id: number;
+
+export type Playlist = {
+    playlistId: number;
     name: string;
     songs?: Song[];
-    // ... other fields
-}
+};
 
 export interface PlaylistProps {     // ← Component props
     id: number;

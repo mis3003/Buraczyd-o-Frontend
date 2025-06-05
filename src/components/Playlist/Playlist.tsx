@@ -26,21 +26,21 @@ export function Playlist({ selected, songs, onAddSong, onSongSelect }: PlaylistP
         </Button>
       </Group>
 
-      <Stack>
-        {songs.map((song, index) => (
-          <Group key={song.url} justify="space-between">
-            <Text>{song.name}</Text>
-            <ActionIcon
-              variant="filled"
-              color="blue"
-              size="lg"
-              onClick={() => onSongSelect(song.url, index)}
-            >
-              <IconPlayerPlay size={18} />
-            </ActionIcon>
-          </Group>
-        ))}
-      </Stack>
+        <Stack>
+            {songs.map((song, index) => (
+                <Group key={song.songUrl} justify="space-between">
+                    <Text>{song.title}</Text>
+                    <ActionIcon
+                        variant="filled"
+                        color="blue"
+                        size="lg"
+                        onClick={() => onSongSelect(song.songUrl, index)}
+                    >
+                        <IconPlayerPlay size={18} />
+                    </ActionIcon>
+                </Group>
+            ))}
+        </Stack>
     </>
   );
 }

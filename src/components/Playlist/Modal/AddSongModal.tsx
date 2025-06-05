@@ -29,31 +29,31 @@ export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) 
 
 
     setLoading(true);
-    let name = songName.trim();
+    let title = songName.trim();
 
     try {
       // If no manual name provided, fetch from platform
-      if (!name) {
+      if (!title) {
         if (platform === 'youtube') {
-          name = await fetchYoutubeTitle(songURL);
+          title = await fetchYoutubeTitle(songURL);
         } else if (platform === 'spotify') {
           const spotifyAccessToken = await fetchSpotifyToken();
           if (spotifyAccessToken) {
-            name = (await fetchSpotifyTitle(songURL, spotifyAccessToken)) ?? "";
+            title = (await fetchSpotifyTitle(songURL, spotifyAccessToken)) ?? "";
           }
         }
       }
 
-      if (!name.trim()) {
+      if (!title.trim()) {
         alert('Nie udało się pobrać nazwy piosenki');
         return;
       }
 
       // Create song object without playlistId (will be added by parent component)
       const newSong: CreateSongRequest = {
-        name,
-        source: platform,
-        url: songURL
+        title: title,
+        platform: platform,
+        songUrl: songURL
       };
 
       onAddSong(newSong);

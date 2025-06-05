@@ -23,14 +23,16 @@ export const CommonLayout = ({ children }: any) => {
         if (!selectedPlaylist) return;
 
         const newSong: Song = {
-            ...songRequest,
-            id: Date.now(), // tymczasowe ID
-            playlistId: selectedPlaylist.id,
+            songId: Date.now(), // tymczasowe ID
+            title: songRequest.title,
+            songUrl: songRequest.songUrl,
+            platform: songRequest.platform,
+            playlistId: selectedPlaylist.playlistId,
         };
 
         setPlaylistData((prev) => ({
             ...prev,
-            [selectedPlaylist.id]: [...(prev[selectedPlaylist.id] || []), newSong],
+            [selectedPlaylist.playlistId]: [...(prev[selectedPlaylist.playlistId] || []), newSong],
         }));
     };
 
@@ -41,15 +43,25 @@ export const CommonLayout = ({ children }: any) => {
             </AppShell.Header>
 
             <AppShell.Navbar>
-                <Sidebar onSelect={setSelectedPlaylist} />
+                <Sidebar
+                    onSelect={(playlist) => {
+                        setSelectedPlaylist(playlist);
+
+                        // Save songs into playlistData if not already present
+                        setPlaylistData((prev) => ({
+                            ...prev,
+                            [playlist.playlistId]: prev[playlist.playlistId] || playlist.songs, // only set if not already
+                        }));
+                    }}
+                />
             </AppShell.Navbar>
 
             <AppShell.Main style={{ paddingLeft: 300 }}>
                 {selectedPlaylist && (
                     <PlaylistComponent
-                        id={selectedPlaylist.id}
+                        id={selectedPlaylist.playlistId}
                         selected={selectedPlaylist.name}
-                        songs={playlistData[selectedPlaylist.id] || []}
+                        songs={playlistData[selectedPlaylist.playlistId] || []}
                         onAddSong={handleAddSong}
                         onSongSelect={(url, index) => handleSongSelect(selectedPlaylist, url, index)}
                     />
@@ -58,7 +70,7 @@ export const CommonLayout = ({ children }: any) => {
 
             <AppShell.Footer>
                 <Footer
-                    playlist={(playingPlaylist ? playlistData[playingPlaylist.id] : []) || []}
+                    playlist={(playingPlaylist ? playlistData[playingPlaylist.playlistId] : []) || []}
                     currentIndex={currentIndex}
                     setCurrentIndex={setCurrentIndex}
                 />

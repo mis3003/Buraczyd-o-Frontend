@@ -75,10 +75,10 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
 
   useEffect(() => {
     if (currentSong) {
-      setSource(currentSong.source);
+      setSource(currentSong.platform);
       setProgress(0);
       setDuration(0);
-      if (currentSong.source === 'youtube') {
+      if (currentSong.platform === 'youtube') {
         playerRef.current?.seekTo(0, 'fraction');
       }
     }
@@ -123,7 +123,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
             source === 'youtube' ? (
                 <ReactPlayer
                     ref={playerRef}
-                    url={currentSong.url}
+                    url={currentSong.songUrl}
                     playing={isPlaying}
                     width="0%"
                     height="0%"
@@ -146,7 +146,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
                 <>
                   <WebPlayback
                       token={token}
-                      trackUri={currentSong.url}
+                      trackUri={currentSong.songUrl}
                       isPlaying={isPlaying}
                       onTrackEnd={handleNext}
                       volume={volume}

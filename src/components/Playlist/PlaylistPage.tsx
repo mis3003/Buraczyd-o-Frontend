@@ -22,8 +22,8 @@ export function PlaylistPage() {
         const data = await getUserPlaylistsWithSongs();
 
         setPlaylists(data);
-        if (data.length > 0 && data[0].id) {
-          setSelectedPlaylistId(data[0].id);
+        if (data.length > 0 && data[0].playlistId) {
+          setSelectedPlaylistId(data[0].playlistId);
         }
       } catch (err) {
         console.error('Failed to fetch playlists:', err);
@@ -52,7 +52,7 @@ export function PlaylistPage() {
       // Update local state
       setPlaylists(prev =>
           prev.map(playlist =>
-              playlist.id === selectedPlaylistId
+              playlist.playlistId === selectedPlaylistId
                   ? { ...playlist, songs: [...(playlist.songs || []), createdSong] }
                   : playlist
           )
@@ -80,11 +80,11 @@ export function PlaylistPage() {
     return <p>Brak playlist</p>;
   }
 
-  const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
+  const selectedPlaylist = playlists.find(p => p.playlistId === selectedPlaylistId);
 
   return selectedPlaylist ? (
       <PlaylistComponent
-          id={selectedPlaylist.id}
+          id={selectedPlaylist.playlistId}
           selected={selectedPlaylist.name} // Now this works because selectedPlaylist is of type Playlist
           songs={selectedPlaylist.songs || []}
           onAddSong={handleAddSong}

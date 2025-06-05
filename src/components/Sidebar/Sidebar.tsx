@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ScrollArea, Stack, Title, Text, Button } from '@mantine/core';
-import { createPlaylist, getUserPlaylists } from '../../services/playlistService';
+import {createPlaylist, getUserPlaylists, getUserPlaylistsWithSongs} from '../../services/playlistService';
 import { Playlist } from '../../types/Playlist';
 import classes from './Sidebar.module.css';
 
@@ -15,7 +15,7 @@ export function Sidebar({
     useEffect(() => {
         const fetchPlaylists = async () => {
             try {
-                const data = await getUserPlaylists();
+                const data = await getUserPlaylistsWithSongs();
                 setPlaylists(data);
             } catch (error) {
                 console.error('Błąd podczas pobierania playlist:', error);
@@ -23,6 +23,10 @@ export function Sidebar({
         };
         fetchPlaylists();
     }, []);
+
+    useEffect(() => {
+        console.log("Playlists zaktualizowane:", playlists);
+    }, [playlists]);
 
     const handleAddPlaylist = async () => {
         const name = prompt('Podaj nazwę nowej playlisty:');
@@ -37,7 +41,9 @@ export function Sidebar({
     };
 
     const handleSelect = (playlist: Playlist) => {
-        setSelectedId(playlist.id);
+        console.log(playlist.playlistId);
+        console.log(playlist.songs);
+        setSelectedId(playlist.playlistId);
         onSelect(playlist);
     };
 
@@ -51,8 +57,8 @@ export function Sidebar({
                 <Stack>
                     {playlists.map((playlist) => (
                         <Text
-                            key={playlist.id}
-                            className={`${classes.item} ${selectedId === playlist.id ? classes.activeItem : ''}`}
+                            key={playlist.playlistId}
+                            className={`${classes.item} ${selectedId === playlist.playlistId ? classes.activeItem : ''}`}
                             onClick={() => handleSelect(playlist)}
                         >
                             {playlist.name}
