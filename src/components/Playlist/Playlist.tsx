@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Title, Stack, Text, Button, Group, ActionIcon } from '@mantine/core';
-import { IconPlus, IconPlayerPlay } from '@tabler/icons-react';
+import {IconPlus, IconPlayerPlay, IconTrash} from '@tabler/icons-react';
 import { AddSongModal } from './Modal/AddSongModal';
 import {Song} from "../../types/Song";
 import {PlaylistProps} from "../../types/Playlist";
@@ -8,7 +8,7 @@ import {PlaylistProps} from "../../types/Playlist";
 
 
 
-export function Playlist({ selected, songs, onAddSong, onSongSelect }: PlaylistProps) {
+export function Playlist({ id,selected, songs, onAddSong, onSongSelect,onDeleteSong }: PlaylistProps) {
   const [modalOpened, setModalOpened] = useState(false);
 
   return (
@@ -17,6 +17,7 @@ export function Playlist({ selected, songs, onAddSong, onSongSelect }: PlaylistP
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         onAddSong={onAddSong}
+        playlistId={id}
       />
 
       <Group justify="space-between" mb="md">
@@ -30,14 +31,27 @@ export function Playlist({ selected, songs, onAddSong, onSongSelect }: PlaylistP
             {songs.map((song, index) => (
                 <Group key={song.songUrl} justify="space-between">
                     <Text>{song.title}</Text>
-                    <ActionIcon
-                        variant="filled"
-                        color="blue"
-                        size="lg"
-                        onClick={() => onSongSelect(song.songUrl, index)}
-                    >
-                        <IconPlayerPlay size={18} />
-                    </ActionIcon>
+
+                    <Group gap="xs">
+
+                        <ActionIcon
+                            variant="light"
+                            color="red"
+                            size="lg"
+                            onClick={() => onDeleteSong(song.songId)}
+                            title="Usuń piosenkę"
+                        >
+                            <IconTrash size={18} />
+                        </ActionIcon>
+                        <ActionIcon
+                            variant="filled"
+                            color="blue"
+                            size="lg"
+                            onClick={() => onSongSelect(song.songUrl, index)}
+                        >
+                            <IconPlayerPlay size={18} />
+                        </ActionIcon>
+                    </Group>
                 </Group>
             ))}
         </Stack>

@@ -13,13 +13,13 @@ export const CommonLayout = ({ children }: any) => {
     const [playlistData, setPlaylistData] = useState<{ [playlistId: number]: Song[] }>({});
 
     const [currentIndex, setCurrentIndex] = useState(0);
-
+    const API_URL = process.env.REACT_APP_API_BASE_URL!;
     const handleSongSelect = (playlist: Playlist, url: string, index: number) => {
         setPlayingPlaylist(playlist);
         setCurrentIndex(index);
     };
 
-    const handleAddSong = (songRequest: CreateSongRequest) => {
+    const handleAddSong = (songRequest: Song) => {
         if (!selectedPlaylist) return;
 
         const newSong: Song = {
@@ -35,6 +35,35 @@ export const CommonLayout = ({ children }: any) => {
             [selectedPlaylist.playlistId]: [...(prev[selectedPlaylist.playlistId] || []), newSong],
         }));
     };
+
+
+    const handleDeleteSong = async (songId: number) => {
+        try {
+            const response = await fetch(`${API_URL}/songs/${songId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Nie udało się usunąć piosenki');
+            }
+
+            // Możesz też opcjonalnie wyświetlić toast albo komunikat
+            console.log('Piosenka została usunięta');
+
+            if (!selectedPlaylist) return;
+
+            const { playlistId } = selectedPlaylist;
+
+            setPlaylistData((prev) => ({
+                ...prev,
+                [playlistId]: prev[playlistId].filter((song) => song.songId !== songId),
+            }));
+        } catch (error) {
+            console.error('Błąd podczas usuwania piosenki:', error);
+        }
+    };
+
 
     return (
         <AppShell header={{ height: 60 }} navbar={{ width: 250, breakpoint: 'sm' }}>
@@ -64,6 +93,7 @@ export const CommonLayout = ({ children }: any) => {
                         songs={playlistData[selectedPlaylist.playlistId] || []}
                         onAddSong={handleAddSong}
                         onSongSelect={(url, index) => handleSongSelect(selectedPlaylist, url, index)}
+                        onDeleteSong={(songId) => handleDeleteSong(songId)}
                     />
                 )}
             </AppShell.Main>

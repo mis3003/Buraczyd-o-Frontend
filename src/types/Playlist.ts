@@ -12,8 +12,9 @@ export interface PlaylistProps {     // ← Component props
     id: number;
     selected: string;
     songs: Song[];
-    onAddSong: (song: CreateSongRequest) => void;
+    onAddSong: (song: Song) => void;
     onSongSelect: (url: string, index: number) => void;
+    onDeleteSong: (songID: number) => void;
 }
 export interface CreatePlaylistRequest {
     name: string;

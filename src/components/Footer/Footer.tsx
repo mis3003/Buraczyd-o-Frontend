@@ -22,7 +22,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
-  const [source, setSource] = useState<'youtube' | 'spotify'>('youtube');
+  const [source, setSource] = useState<'YouTube' | 'Spotify'>('YouTube');
   const playerRef = useRef<ReactPlayer>(null);
   const [token, setToken] = useState<string | null>(null);
   const [volume, setVolume] = useState(0.8);
@@ -78,7 +78,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
       setSource(currentSong.platform);
       setProgress(0);
       setDuration(0);
-      if (currentSong.platform === 'youtube') {
+      if (currentSong.platform === 'YouTube') {
         playerRef.current?.seekTo(0, 'fraction');
       }
     }
@@ -110,9 +110,9 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
 
   const handleSeekEnd = () => {
     setIsSeeking(false);
-    if (source === 'youtube') {
+    if (source === 'YouTube') {
       handleSeekYouTube(progress);
-    } else if (source === 'spotify') {
+    } else if (source === 'Spotify') {
       handleSeekSpotify(progress);
     }
   };
@@ -120,7 +120,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
   return (
       <div className={classes.footer}>
         {currentSong ? (
-            source === 'youtube' ? (
+            source === 'YouTube' ? (
                 <ReactPlayer
                     ref={playerRef}
                     url={currentSong.songUrl}
@@ -142,7 +142,7 @@ export function Footer({ playlist, currentIndex, setCurrentIndex }: FooterProps)
                     onPause={() => setIsPlaying(false)}
                     onError={e => console.error('Błąd odtwarzania:', e)}
                 />
-            ) : source === 'spotify' && token ? (
+            ) : source === 'Spotify' && token ? (
                 <>
                   <WebPlayback
                       token={token}

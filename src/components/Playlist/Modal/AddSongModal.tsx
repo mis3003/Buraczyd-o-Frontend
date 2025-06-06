@@ -3,18 +3,22 @@ import { Modal, TextInput, Button, ButtonGroup } from '@mantine/core';
 import { fetchYoutubeTitle } from './YoutubeHandler';
 import { fetchSpotifyTitle } from "./SpotifyHandler";
 import { fetchSpotifyToken } from "../../../services/spotifyService";
-import { CreateSongRequest } from "../../../types/Song";
+import { Song,CreateSongRequest } from "../../../types/Song";
+import {createSong} from "../../../services/songService";
+
 
 interface AddSongModalProps {
   opened: boolean;
   onClose: () => void;
-  onAddSong: (song: CreateSongRequest) => void; // Use CreateSongRequest instead
+  onAddSong: (song: Song) => void; // Use CreateSongRequest instead
+  playlistId: number;
 }
 
-export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) {
+export function AddSongModal({ opened, onClose, onAddSong, playlistId }: AddSongModalProps) {
+
   const [songURL, setSongUrl] = useState('');
   const [songName, setSongName] = useState('');
-  const [platform, setPlatform] = useState<'youtube' | 'spotify'>('youtube');
+  const [platform, setPlatform] = useState<'YouTube' | 'Spotify'>('YouTube');
   const [loading, setLoading] = useState(false);
 
   const handleAdd = async () => {
@@ -22,21 +26,15 @@ export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) 
       alert('Podaj link do piosenki');
       return;
     }
-    console.log('Dodawanie piosenki...');
-    console.log('Link:', songURL);
-    console.log('Platforma:', platform);
-    console.log('Ręczna nazwa:', songName);
-
 
     setLoading(true);
     let title = songName.trim();
 
     try {
-      // If no manual name provided, fetch from platform
       if (!title) {
-        if (platform === 'youtube') {
+        if (platform === 'YouTube') {
           title = await fetchYoutubeTitle(songURL);
-        } else if (platform === 'spotify') {
+        } else if (platform === 'Spotify') {
           const spotifyAccessToken = await fetchSpotifyToken();
           if (spotifyAccessToken) {
             title = (await fetchSpotifyTitle(songURL, spotifyAccessToken)) ?? "";
@@ -49,19 +47,21 @@ export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) 
         return;
       }
 
-      // Create song object without playlistId (will be added by parent component)
       const newSong: CreateSongRequest = {
         title: title,
         platform: platform,
-        songUrl: songURL
+        songUrl: songURL,
+        playlistId: playlistId,
       };
 
-      onAddSong(newSong);
+      const savedSong = await createSong(newSong); // <-- wywołanie API
+      console.log('savedSong', savedSong);
+      onAddSong(savedSong); // <-- przekazanie zapisanego obiektu do rodzica
 
-      // Reset form
+      // Reset
       setSongName('');
       setSongUrl('');
-      setPlatform('youtube');
+      setPlatform('YouTube');
       onClose();
 
     } catch (error) {
@@ -72,19 +72,20 @@ export function AddSongModal({ opened, onClose, onAddSong }: AddSongModalProps) 
     }
   };
 
+
   return (
       <Modal opened={opened} onClose={onClose} title="Dodaj piosenkę">
         <ButtonGroup mb="md">
           <Button
-              variant={platform === 'youtube' ? 'filled' : 'outline'}
-              onClick={() => setPlatform('youtube')}
+              variant={platform === 'YouTube' ? 'filled' : 'outline'}
+              onClick={() => setPlatform('YouTube')}
               disabled={loading}
           >
             Youtube
           </Button>
           <Button
-              variant={platform === 'spotify' ? 'filled' : 'outline'}
-              onClick={() => setPlatform('spotify')}
+              variant={platform === 'Spotify' ? 'filled' : 'outline'}
+              onClick={() => setPlatform('Spotify')}
               disabled={loading}
           >
             Spotify
