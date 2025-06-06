@@ -24,8 +24,6 @@ export function Header() {
         <header className={classes.header}>
             <Container size="md" className={classes.inner}>
 
-                <Group gap={5} >
-
                     <Button
                         className={classes.link}
                         data-active={active === '/Spotify' || undefined}
@@ -53,20 +51,8 @@ export function Header() {
 
                         Zaloguj do Spotify
                     </Button>
-                </Group>
-                <Group gap={10}>
-                    <TextInput
-                        placeholder="Wprowadz link"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                    />
-                    <Button
-                        onClick={handleSearch}
-                        style={{ backgroundColor: '#730029' }}
-                    >
-                        Szukaj
-                    </Button>
-                </Group>
+
+
 
             </Container>
         </header>

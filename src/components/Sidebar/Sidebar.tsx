@@ -1,39 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ScrollArea, Stack, Title, Text, Button } from '@mantine/core';
-import {createPlaylist, getUserPlaylists, getUserPlaylistsWithSongs} from '../../services/playlistService';
 import { Playlist } from '../../types/Playlist';
 import classes from './Sidebar.module.css';
 
-export function Sidebar({
-                            onSelect,
-                        }: {
+interface SidebarProps {
+    playlists: Playlist[];
     onSelect: (playlist: Playlist) => void;
-}) {
-    const [playlists, setPlaylists] = useState<Playlist[]>([]);
+    onAddPlaylist: (name: string) => Promise<Playlist>;
+}
+
+export function Sidebar({ playlists, onSelect, onAddPlaylist }: SidebarProps) {
     const [selectedId, setSelectedId] = useState<number | null>(null);
-
-    useEffect(() => {
-        const fetchPlaylists = async () => {
-            try {
-                const data = await getUserPlaylistsWithSongs();
-                setPlaylists(data);
-            } catch (error) {
-                console.error('Błąd podczas pobierania playlist:', error);
-            }
-        };
-        fetchPlaylists();
-    }, []);
-
-    useEffect(() => {
-        console.log("Playlists zaktualizowane:", playlists);
-    }, [playlists]);
 
     const handleAddPlaylist = async () => {
         const name = prompt('Podaj nazwę nowej playlisty:');
         if (name) {
             try {
-                const newPlaylist = await createPlaylist({ name });
-                setPlaylists((prev) => [...prev, newPlaylist]);
+                await onAddPlaylist(name);
             } catch (error) {
                 console.error('Błąd podczas tworzenia playlisty:', error);
             }
@@ -50,7 +33,14 @@ export function Sidebar({
     return (
         <aside className={classes.sidebar}>
             <Title order={4} className={classes.title}>Biblioteka</Title>
-            <Button onClick={handleAddPlaylist} fullWidth size="xs" mb="sm">
+            <Button
+                onClick={handleAddPlaylist}
+                fullWidth
+                size="xs"
+                mb="sm"
+                className={classes.addButton}
+                variant="filled"
+            >
                 Dodaj playlistę
             </Button>
             <ScrollArea h="80vh">

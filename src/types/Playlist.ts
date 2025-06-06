@@ -15,6 +15,7 @@ export interface PlaylistProps {     // ← Component props
     onAddSong: (song: Song) => void;
     onSongSelect: (url: string, index: number) => void;
     onDeleteSong: (songID: number) => void;
+    onDeletePlaylist: (playlistId: number) => void;
 }
 export interface CreatePlaylistRequest {
     name: string;
